@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Process list{% endblock %}
+
+{% block content %}
+    <h1>Process list</h1>
+
+    <div id="process-list"
+         hx-get="{% url 'process_list' %}?{{ request.GET.urlencode }}"
+         hx-trigger="load, every 30s"
+         hx-swap="innerHTML">
+        {% include 'process/process_list.html' %}
+    </div>
+{% endblock %}

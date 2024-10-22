@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Snapshots{% endblock %}
+
+{% block content %}
+    <h1>Saved Snapshots</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Author</th>
+                <th>Process Count</th>
+                <th>View Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for snapshot in snapshots %}
+            <tr>
+                <td>{{ snapshot.timestamp }}</td>
+                <td>{{ snapshot.author }}</td>
+                <td>{{ snapshot.process_data|length }}</td>
+                <td>
+                    <a href="{% url 'snapshot_detail' snapshot.id %}">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No snapshots found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

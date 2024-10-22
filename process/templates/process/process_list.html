@@ -1,0 +1,70 @@
+<form method="get" action="{% url 'home' %}">
+        <label for="pid">Filter by PID:</label>
+        <input type="text" id="pid" name="pid" value="{{ request.GET.pid }}">
+
+        <label for="name">Filter by Name:</label>
+        <input type="text" id="name" name="name" value="{{ request.GET.name }}">
+
+        <label for="status">Filter by Status:</label>
+        <select id="status" name="status">
+            <option value="" {% if not request.GET.status %}selected{% endif %}>All</option>
+            <option value="running" {% if request.GET.status == 'running' %}selected{% endif %}>Running</option>
+            <option value="stopped" {% if request.GET.status == 'stopped' %}selected{% endif %}>Stopped</option>
+        </select>
+
+        <button type="submit">Filter</button>
+</form>
+
+<p>Timestamp of last refresh: {{ current_time|date:"Y-m-d H:i:s" }}</p>
+
+<div class="process-list-actions">
+    <form method="post" action="{% url 'save_snapshot' %}">
+        {% csrf_token %}
+        <input type="hidden" name="process_data" value="{{ processes }}">
+        <button type="submit">Save Snapshot</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                <a href="?sort=pid&order={% if sort_key == 'pid' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&pid={{ request.GET.pid }}&name={{ request.GET.name }}&status={{ request.GET.status }}">PID</a>
+            </th>
+            <th>
+                <a href="?sort=name&order={% if sort_key == 'name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&pid={{ request.GET.pid }}&name={{ request.GET.name }}&status={{ request.GET.status }}">Name</a>
+            </th>
+            <th>
+                <a href="?sort=status&order={% if sort_key == 'status' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&pid={{ request.GET.pid }}&name={{ request.GET.name }}&status={{ request.GET.status }}">Status</a>
+            </th>
+            <th>
+                <a href="?sort=memory_usage&order={% if sort_key == 'memory_usage' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&pid={{ request.GET.pid }}&name={{ request.GET.name }}&status={{ request.GET.status }}">Memory Usage (MB)</a>
+            </th>
+            <th>
+                <a href="?sort=cpu_usage&order={% if sort_key == 'cpu_usage' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&pid={{ request.GET.pid }}&name={{ request.GET.name }}&status={{ request.GET.status }}">CPU Usage (%)</a>
+            </th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for process in processes %}
+        <tr>
+            <td>{{ process.pid }}</td>
+            <td>{{ process.name }}</td>
+            <td>{{ process.status }}</td>
+            <td>{{ process.memory_usage }}</td>
+            <td>{{ process.cpu_usage }}</td>
+            <td>
+                <form method="post" action="{% url 'kill_process' process.pid %}">
+                    {% csrf_token %}
+                    <button type="submit">Kill</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No processes found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
